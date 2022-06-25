@@ -1,12 +1,24 @@
-import { Controller, Get } from '@nestjs/common';
-import { VisitsService } from '../services/visits.service';
+import { Controller, Get, HttpStatus, Inject } from '@nestjs/common';
+import { VisitsService, VisitsServiceInterface } from '../services/visits.service';
+import { VisitsCounterDto } from '../dto/visits-counter.dto';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-@Controller()
+@ApiTags('visits')
+@Controller('visits')
 export class VisitsController {
-  constructor(private readonly visitsService: VisitsService) {}
+  constructor(
+    @Inject(VisitsService)
+    private readonly visitsService: VisitsServiceInterface,
+  ) {}
 
-  @Get()
-  public getVisits() {
-    return this.visitsService.getVisits();
+  @ApiOperation({ summary: 'Get visits counter for each visitor' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: VisitsCounterDto,
+    isArray: true,
+  })
+  @Get('counter')
+  public getVisitsCounter(): Promise<VisitsCounterDto[]> {
+    return this.visitsService.getVisitsCounter();
   }
 }
